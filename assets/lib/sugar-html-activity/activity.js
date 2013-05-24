@@ -9,7 +9,12 @@ define(function (require) {
         shortcut.add("Ctrl", "Q", this.close);
     };
 
-    activity.getXOColor = function (callback) {
+    activity.getXOColor = function(callback) {
+        if (AndroidActivity) {
+            var colorString = AndroidActivity.getXOColor();
+            callback(colorString.split(','));
+            return;
+        }
         try {
             bus.sendMessage("activity.get_xo_color", [], callback);
         }
@@ -20,7 +25,11 @@ define(function (require) {
         }
     };
 
-    activity.close = function (callback) {
+    activity.close = function(callback) {
+        if (AndroidActivity) {
+            AndroidActivity.stop();
+            return;
+        }
         try {
             bus.sendMessage("activity.close", [], callback);
         }
