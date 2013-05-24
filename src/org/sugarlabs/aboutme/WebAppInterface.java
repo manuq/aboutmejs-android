@@ -22,4 +22,9 @@ public class WebAppInterface {
     public String getXOColor() {
         return ((AboutMeActivity) mContext).mService.getXOColor();
     }
+
+    @JavascriptInterface
+    public void setXOColor(String colors) {
+        ((AboutMeActivity) mContext).mService.setXOColor(colors);
+    }
 }

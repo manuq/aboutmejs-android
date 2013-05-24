@@ -20,15 +20,16 @@ public class SugarService extends Service {
 	@Override
 	public IBinder onBind(Intent arg0) {
 		sugarSettings = getSharedPreferences(SETTINGS, 0);
-		SharedPreferences.Editor editor = sugarSettings.edit();
-		editor.putString("user-color", "#FFFF00,#00FFFF");
-		editor.commit();
 		return mBinder;
 	}
 
-	/** method for clients */
 	public String getXOColor() {
-        // I don't know how to use arrays in java yet :)
-		return sugarSettings.getString("user-color", "");
+		return sugarSettings.getString("user-color", "#FFFF00,#00FFFF");
+    }
+
+	public void setXOColor(String colors) {
+		SharedPreferences.Editor editor = sugarSettings.edit();
+		editor.putString("user-color", colors);
+		editor.commit();
     }
 }

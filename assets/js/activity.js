@@ -51,6 +51,9 @@ define(function (require) {
                 xocolor.colors.length)];
             icon.colorize(button, randomColors);
             colors[button.id] = randomColors;
+
+            // save setting
+            activity.setXOColor(currentColors);
         }
 
     });
