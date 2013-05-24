@@ -1,0 +1,37 @@
+body, #canvas {
+  background-color: white;
+}
+
+#toolbar #activity-button {
+  background-image: url(../activity/activity-icon.svg);
+}
+
+#canvas {
+  text-align: center;
+}
+
+#color-icons button, #icon-current {
+  background-color: transparent;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-image: url(../activity/activity-icon.svg);
+  margin: 0;
+  width: 100px;
+  height: 100px;
+  border-size: 10px;
+  border-radius: 15px;
+}
+
+#color-icons button:hover {
+  background-color: #d1d1d1;
+  border-color: #d1d1d1;
+}
+
+#color-icons button:active {
+  background-color: white;
+}
+
+#icon-current {
+  display: inline-block;
+}
