@@ -20,7 +20,6 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public String getXOColor() {
-        // I don't know how to use arrays in java yet :)
-        return "#FFFF00,#00FFFF";
+        return ((AboutMeActivity) mContext).mService.getXOColor();
     }
 }
