@@ -1,7 +1,11 @@
 package org.sugarlabs.aboutme;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,13 +19,14 @@ import android.webkit.WebViewClient;
 import android.webkit.WebChromeClient;
 import android.webkit.ConsoleMessage;
 
-import org.sugarlabs.aboutme.SugarService.LocalBinder;
 import org.sugarlabs.aboutme.WebAppInterface;
 
 public class AboutMeActivity extends Activity {
-	SugarService mService;
+    Messenger mService = null;
     boolean mBound = false;
-
+    WebAppInterface webAppInterface;
+    WebView webView;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,11 +36,12 @@ public class AboutMeActivity extends Activity {
         setContentView(R.layout.activity_about_me);
 
         // Configure the webview setup in the xml layout
-        WebView myWebView = (WebView) findViewById(R.id.webview);
-        myWebView.addJavascriptInterface(new WebAppInterface(this), "AndroidActivity");
+        webView = (WebView) findViewById(R.id.webview);
+        webAppInterface = new WebAppInterface(this);
+        webView.addJavascriptInterface(webAppInterface, "AndroidActivity");
 
         // Allow javascript
-        WebSettings webSettings = myWebView.getSettings();
+        WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
         // This setting defaults to false since API level 16
@@ -45,10 +51,10 @@ public class AboutMeActivity extends Activity {
 
         // Make sure links in the webview is handled by the webview
         // and not sent to a full browser
-        myWebView.setWebViewClient(new WebViewClient());
+        webView.setWebViewClient(new WebViewClient());
 
         // Send javascript console messages to Eclipse LogCat
-        myWebView.setWebChromeClient(new WebChromeClient() {
+        webView.setWebChromeClient(new WebChromeClient() {
           public boolean onConsoleMessage(ConsoleMessage cm) {
             Log.d("Sugar Activity", cm.message() + " -- From line "
                   + cm.lineNumber() + " of "
@@ -58,13 +64,12 @@ public class AboutMeActivity extends Activity {
         });
 
         // Finally, load the Sugar activity
-        myWebView.loadUrl("file:///android_asset/index.html");
+        webView.loadUrl("file:///android_asset/index.html");
     }
     
     @Override
     protected void onStart() {
         super.onStart();
-        // Bind to LocalService
         Intent intent = new Intent(this, SugarService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
@@ -72,28 +77,47 @@ public class AboutMeActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-        // Unbind from the service
         if (mBound) {
             unbindService(mConnection);
             mBound = false;
         }
     }
 
+    /**
+     * Handler of incoming messages from service.
+     */
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+        	webAppInterface.messageCallback(msg);
+        }
+    }
+    
+    /**
+     * Target we publish for clients to send messages to IncomingHandler.
+     */
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            LocalBinder binder = (LocalBinder) service;
-            mService = binder.getService();
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = new Messenger(service);
             mBound = true;
         }
 
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
+        public void onServiceDisconnected(ComponentName className) {
+            mService = null;
             mBound = false;
         }
     };
+
+    public void sendMessage(Message msg) {
+        msg.replyTo = mMessenger;
+        if (!mBound) return;
+        try {
+            mService.send(msg);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
 }

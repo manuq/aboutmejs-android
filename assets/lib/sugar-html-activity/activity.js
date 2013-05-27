@@ -9,10 +9,14 @@ define(function (require) {
         shortcut.add("Ctrl", "Q", this.close);
     };
 
+    activity.runAndroidCallback = function(data) {
+        this.callback(data.split(','));
+    }
+
     activity.getXOColor = function(callback) {
         if (AndroidActivity) {
-            var colorString = AndroidActivity.getXOColor();
-            callback(colorString.split(','));
+            this.callback = callback;
+            AndroidActivity.getXOColor();
             return;
         }
         try {
