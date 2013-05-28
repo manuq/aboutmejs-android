@@ -40,7 +40,7 @@ public class WebAppInterface {
     
     void messageCallback(Message msg) {
         switch (msg.what) {
-        case SugarService.MSG_GET_XO_COLOR:
+        case MSG_GET_XO_COLOR:
         	Bundle data = msg.getData();
         	String colors = data.getString("colors");
         	((AboutMeActivity) mContext).webView.loadUrl("javascript:activity = require('sugar-html-activity/activity');activity.runAndroidCallback('" + colors + "')");
