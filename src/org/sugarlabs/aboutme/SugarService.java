@@ -8,7 +8,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.widget.Toast;
 
 public class SugarService extends Service {
 	public static final String SETTINGS = "SugarSettings";
@@ -39,7 +38,6 @@ public class SugarService extends Service {
                 break;
             case MSG_SET_XO_COLOR:
             	colors = ((String) msg.obj);
-                Toast.makeText(getApplicationContext(), "SET" + colors, Toast.LENGTH_SHORT).show();
         		SharedPreferences.Editor editor = sugarSettings.edit();
         		editor.putString("user-color", colors);
         		editor.commit();
