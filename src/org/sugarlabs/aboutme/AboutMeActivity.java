@@ -70,7 +70,7 @@ public class AboutMeActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        Intent intent = new Intent(this, SugarService.class);
+        Intent intent = new Intent("org.sugarlabs.aboutme.action.BIND_ACTIVITY");
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
     }
 

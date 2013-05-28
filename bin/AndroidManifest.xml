@@ -24,7 +24,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="org.sugarlabs.aboutme.SugarService" />
+        <service android:name="org.sugarlabs.aboutme.SugarService" android:process=":server_process">
+            <intent-filter>
+                <action android:name="org.sugarlabs.aboutme.action.BIND_ACTIVITY" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

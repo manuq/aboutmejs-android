@@ -3,13 +3,16 @@ package org.sugarlabs.aboutme;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.util.Log;
 
 public class SugarService extends Service {
+	public static final String BIND_ACTIVITY = "org.sugarlabs.aboutme.action.BIND_ACTIVITY";
 	public static final String SETTINGS = "SugarSettings";
 	SharedPreferences sugarSettings;
 	
@@ -23,13 +26,14 @@ public class SugarService extends Service {
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            String colors;
             switch (msg.what) {
             case MSG_GET_XO_COLOR:
-        		colors = sugarSettings.getString("user-color", "#FFFF00,#00FFFF");
+        		String getColors = sugarSettings.getString("user-color", "#FFFF00,#00FFFF");
         		Messenger mClient = msg.replyTo;
         		Message replyMsg = Message.obtain(null, MSG_GET_XO_COLOR, 0, 0);
-        		replyMsg.obj = colors;
+                Bundle bundle = new Bundle();
+                bundle.putString("colors", getColors);
+        		replyMsg.setData(bundle);
                 try {
                     mClient.send(replyMsg);
                 } catch (RemoteException e) {
@@ -37,9 +41,10 @@ public class SugarService extends Service {
                 }
                 break;
             case MSG_SET_XO_COLOR:
-            	colors = ((String) msg.obj);
+            	Bundle data = msg.getData();
+            	String setColors = data.getString("colors");
         		SharedPreferences.Editor editor = sugarSettings.edit();
-        		editor.putString("user-color", colors);
+        		editor.putString("user-color", setColors);
         		editor.commit();
                 break;
             default:
